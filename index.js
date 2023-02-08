@@ -10,6 +10,12 @@ const ejs = require("ejs");
 const User = require("./models/user");
 
 
+app.set("view engine", "ejs");
+app.set("views", "views");
+
+
+
+
 
 //Routes:
 //=================================================================
@@ -18,6 +24,10 @@ app.get("/secret", (req, res) => {
     res.send("Secret route! cant be seen untill logged in!")
 })
 
+
+app.get("/register", (req, res) => {
+    res.render("register");
+})
 
 // App is listening on Port:
 //==================================================================
