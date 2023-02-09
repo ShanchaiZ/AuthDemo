@@ -75,16 +75,22 @@ app.post('/login', async (req, res) => {
     } else {
         res.redirect("/login");
     }
-
 })
 
+
+//POST ROUTE: LOG OUT:
+app.post("/logout", (req, res) => {
+    req.session.user_id = null; //method one of logout: the session id to explicitly be null => this removes association
+    // req.session.destroy(); //method two of logout: destroy the entire session if u storing a lot of stuff.
+    res.redirect("/login");
+})
 
 
 app.get("/secret", (req, res) => {
     if (!req.session.user_id) { //if there is no user id then redirect to login.
-        res.redirect("/login")
+        return res.redirect("/login")
     }
-    res.send("Secret route! cant be seen untill logged in!")
+    res.render("secret");
 });
 
 // App is listening on Port:
@@ -136,4 +142,13 @@ app.listen(3000, () => {
 // D. LOG out:
 
 // all we need to do to log someone out is to remove the user_id from the session.
-//
+//create a log out form that form actions to /logout
+
+//ONE WAY TO LOGOUT: add a app.post route on that removes the session id to null.
+//ANOTHER WAY: destroy the session => if u storing more stuff dont want to trace anything.
+
+//----------------------------------------
+
+// E. Require log in middleware: to protect multiple endpoints.
+// F. Refactoring 
+
