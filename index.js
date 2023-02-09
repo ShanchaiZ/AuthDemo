@@ -26,7 +26,7 @@ app.set("view engine", "ejs");
 app.set("views", "views");
 app.use(express.urlencoded({ extended: true }));// we need this to parse req.body
 
-app.use(session({ secret: "notagoodsecret"}))
+app.use(session({ secret: "notagoodsecret" }));
 
 
 //Routes:
@@ -51,6 +51,7 @@ app.post("/register", async (req, res) => {
         password: hash
     });
     await user.save();
+    req.session.user_id = user._id; // if u successfully register/log in - we store ur user id in session.
     res.redirect("/");
 });
 
@@ -67,19 +68,24 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ username: username }); //find user in our db
 
     //once we find the user, bcrypt compares user password with hashed password which returns a boolean result.
-    const validPassword= await bcrypt.compare(password, user.password);
+    const validPassword = await bcrypt.compare(password, user.password);
     if (validPassword) {
-        res.send('WELCOME!!')
+        req.session.user_id = user._id; // if u successfully register/log in - we store ur user id in session.
+        res.redirect("/secret")
     } else {
-        res.send("Incorrect username or password! try again!")
+        res.redirect("/login");
     }
 
 })
 
 
+
 app.get("/secret", (req, res) => {
+    if (!req.session.user_id) { //if there is no user id then redirect to login.
+        res.redirect("/login")
+    }
     res.send("Secret route! cant be seen untill logged in!")
-})
+});
 
 // App is listening on Port:
 //==================================================================
@@ -110,7 +116,7 @@ app.listen(3000, () => {
 //similar to register form but form action is different. then,
 // create a post route: where we findone user with that username. once we find that user,
 // we want to compare the hashed password to the password given by user.  as per docs: const validPassword= await bcrypt.compare(password, user.password);
-//we write if statement about login sucess/failure result. 
+//we write if statement about login sucess/failure result.
 
 //NOTE: if the password is incorrect or there is no username with that name we want to let the user know. BUT what we dont want the user to know is username is correct but password is wrong. we dont want ppl to guess with feedback!! best practise: "incorrect username or password"
 // as of this point: we can register a user => we can log in as user BUT we cant remember user between request.
@@ -120,4 +126,14 @@ app.listen(3000, () => {
 
 // C. KEEPING A USER LOGGED IN (using cookies/session);
 // we want to associate a given user's browers with some pieece of data when they log in.
-// npm require express session
+// npm require express session + its app.use middleware
+
+// reminder: when u successfully log in, we going to add something to session. session store will associate some data with a particular cookie. You automatically receive a cookie once u start using the middleware.
+// then we save the user id after the authentication is successful < req.session.user_id = user._id; > because we often need to use the user ID to find the user so we can allow stuff.
+
+//----------------------------------------
+
+// D. LOG out:
+
+// all we need to do to log someone out is to remove the user_id from the session.
+//
