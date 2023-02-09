@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
+const session = require("express-session");
 const ejs = require("ejs");
 
 
@@ -25,7 +26,7 @@ app.set("view engine", "ejs");
 app.set("views", "views");
 app.use(express.urlencoded({ extended: true }));// we need this to parse req.body
 
-
+app.use(session({ secret: "notagoodsecret"}))
 
 
 //Routes:
@@ -118,3 +119,5 @@ app.listen(3000, () => {
 //----------------------------------------
 
 // C. KEEPING A USER LOGGED IN (using cookies/session);
+// we want to associate a given user's browers with some pieece of data when they log in.
+// npm require express session
