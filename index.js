@@ -28,6 +28,14 @@ app.use(express.urlencoded({ extended: true }));// we need this to parse req.bod
 
 app.use(session({ secret: "notagoodsecret" }));
 
+//middleware to verifry login 
+const requireLogin = (req, res, next) => {
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
+    next();
+}
+
 
 //Routes:
 //=================================================================
@@ -86,10 +94,7 @@ app.post("/logout", (req, res) => {
 })
 
 
-app.get("/secret", (req, res) => {
-    if (!req.session.user_id) { //if there is no user id then redirect to login.
-        return res.redirect("/login")
-    }
+app.get("/secret", requireLogin, (req, res) => {
     res.render("secret");
 });
 
@@ -150,5 +155,15 @@ app.listen(3000, () => {
 //----------------------------------------
 
 // E. Require log in middleware: to protect multiple endpoints.
-// F. Refactoring 
 
+// const requireLogin = (req, res, next) => {
+//     if (!req.session.user_id) {
+//         return res.redirect("/login");
+//     }
+//     next();
+// }
+
+
+//----------------------------------------
+
+// F. optional here: Refactor some of the code out of route handlers!
