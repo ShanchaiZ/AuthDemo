@@ -73,12 +73,9 @@ app.get('/login', (req, res) => {
 //Post Route: User Login form action:
 app.post('/login', async (req, res) => {
     const { password, username } = req.body;
-    const user = await User.findOne({ username: username }); //find user in our db
-
-    //once we find the user, bcrypt compares user password with hashed password which returns a boolean result.
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (validPassword) {
-        req.session.user_id = user._id; // if u successfully register/log in - we store ur user id in session.
+    const foundUser = await User.findAndValidate(username, password);
+    if (foundUser) {
+        req.session.user_id = foundUser._id; // if u successfully register/log in - we store ur user id in session.
         res.redirect("/secret")
     } else {
         res.redirect("/login");
@@ -167,3 +164,4 @@ app.listen(3000, () => {
 //----------------------------------------
 
 // F. optional here: Refactor some of the code out of route handlers!
+//tips: add some logic onto the model to reduce code in main route index.
