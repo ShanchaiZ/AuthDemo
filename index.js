@@ -53,11 +53,7 @@ app.get("/register", (req, res) => {
 //Post route: submit a user from form
 app.post("/register", async (req, res) => {
     const { password, username } = req.body;
-    const hash = await bcrypt.hash(password, 12);
-    const user = new User({
-        username: username,
-        password: hash
-    });
+    const user = new User({ username, password }); // this bad idea for now because we dont want a username with AN EXACT PASSWORD that is being saved in db.
     await user.save();
     req.session.user_id = user._id; // if u successfully register/log in - we store ur user id in session.
     res.redirect("/");
@@ -164,4 +160,6 @@ app.listen(3000, () => {
 //----------------------------------------
 
 // F. optional here: Refactor some of the code out of route handlers!
-//tips: add some logic onto the model to reduce code in main route index.
+//tips: add some logic onto the model to reduce code in main route index. look at explanation in User Model.
+
+// another refactor: let mongoose set the hash password rather than main index during registration.
